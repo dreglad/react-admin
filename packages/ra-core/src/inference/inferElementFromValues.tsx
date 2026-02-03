@@ -137,9 +137,7 @@ const inferElementFromValues = (
     }
     if (valuesAreArray(values)) {
         if (isObject(values[0][0]) && hasType('array', types)) {
-            const leafValues = getValuesFromRecords(
-                values.reduce((acc, vals) => acc.concat(vals), [])
-            );
+            const leafValues = getValuesFromRecords(values.flat());
             // FIXME bad visual representation
             return (
                 types.array &&
@@ -202,7 +200,7 @@ const inferElementFromValues = (
     if (valuesAreObject(values)) {
         // we need to go deeper
         // Arbitrarily, choose the first prop of the first object
-        const propName = Object.keys(values[0]).shift();
+        const propName = Object.keys(values[0])[0];
         if (!propName) {
             return new InferredElement(types.string, { source: name });
         }

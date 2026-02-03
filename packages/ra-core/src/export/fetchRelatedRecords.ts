@@ -7,9 +7,9 @@ import { getRelatedIds } from './getRelatedIds';
  *
  * @example
  *     fetchRelatedRecords(dataProvider)(records, 'post_id', 'posts').then(posts =>
- *         posts.map(record => ({
+ *         records.map(record => ({
  *             ...record,
- *             post_title: posts[record.post_id].title,
+ *             post_title: posts[record.post_id]?.title,
  *         }))
  *     );
  */
