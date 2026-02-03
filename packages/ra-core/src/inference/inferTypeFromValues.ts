@@ -1,3 +1,5 @@
+import map from 'lodash/map.js';
+import keys from 'lodash/keys.js';
 import getValuesFromRecords from './getValuesFromRecords';
 
 import {
@@ -115,15 +117,13 @@ export const inferTypeFromValues = (
     }
     if (valuesAreArray(values)) {
         if (isObject(values[0][0])) {
-            const leafValues = getValuesFromRecords(
-                values.reduce((acc, vals) => acc.concat(vals), [])
-            );
+            const leafValues = getValuesFromRecords(values.flat());
             // FIXME bad visual representation
             return {
                 type: 'array',
                 props: { source: name },
-                children: Object.keys(leafValues).map(leafName =>
-                    inferTypeFromValues(leafName, leafValues[leafName])
+                children: map(leafValues, (leafValues, leafName) =>
+                    inferTypeFromValues(leafName, leafValues)
                 ),
             };
         }
@@ -162,7 +162,7 @@ export const inferTypeFromValues = (
     }
     if (valuesAreObject(values)) {
         /// Arbitrarily, choose the first prop of the first object
-        const propName = Object.keys(values[0]).shift();
+        const propName = keys(values[0])[0];
         if (!propName) {
             return { type: 'object', props: { source: name } };
         }

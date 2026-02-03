@@ -1,3 +1,7 @@
+import isNil from 'lodash/isNil.js';
+import castArray from 'lodash/castArray.js';
+import forOwn from 'lodash/forOwn.js';
+
 /**
  * Gets a list of values indexed by field based on a list of records
  *
@@ -24,18 +28,17 @@
  * //    user_id: [123, 456],
  * // }
  */
-export default (records: any[]) =>
-    records.reduce((values, record) => {
-        Object.keys(record).forEach(fieldName => {
+export default (records: any[]) => {
+    const values: any = {};
+    records.forEach(record => {
+        forOwn(record, (value, fieldName) => {
             if (!values[fieldName]) {
                 values[fieldName] = [];
             }
-            if (record[fieldName] != null) {
-                const value = Array.isArray(record[fieldName])
-                    ? [record[fieldName]]
-                    : record[fieldName];
-                values[fieldName] = values[fieldName].concat(value);
+            if (!isNil(value)) {
+                values[fieldName].push(...castArray(value));
             }
         });
-        return values;
-    }, {});
+    });
+    return values;
+};

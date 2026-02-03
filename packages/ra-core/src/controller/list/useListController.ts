@@ -1,4 +1,6 @@
 import { isValidElement, useCallback, useEffect, useMemo } from 'react';
+import pick from 'lodash/pick.js';
+import omit from 'lodash/omit.js';
 
 import { useAuthenticated, useRequireAccess } from '../../auth';
 import { useTranslate } from '../../i18n';
@@ -521,18 +523,14 @@ export const injectedProps = [
  * to be passed to the List children need
  * This is an implementation of pick()
  */
-export const getListControllerProps = props =>
-    injectedProps.reduce((acc, key) => ({ ...acc, [key]: props[key] }), {});
+export const getListControllerProps = props => pick(props, injectedProps);
 
 /**
  * Select the props not injected by the useListController hook
  * to be used inside the List children to sanitize props injected by List
  * This is an implementation of omit()
  */
-export const sanitizeListRestProps = props =>
-    Object.keys(props)
-        .filter(propName => !injectedProps.includes(propName))
-        .reduce((acc, key) => ({ ...acc, [key]: props[key] }), {});
+export const sanitizeListRestProps = props => omit(props, injectedProps);
 
 export interface GetDataOptions {
     maxResults?: number;

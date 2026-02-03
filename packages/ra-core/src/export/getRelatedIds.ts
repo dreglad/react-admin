@@ -1,3 +1,5 @@
+import isNil from 'lodash/isNil.js';
+import castArray from 'lodash/castArray.js';
 import { RaRecord, Identifier } from '../types';
 
 /**
@@ -25,12 +27,15 @@ import { RaRecord, Identifier } from '../types';
 export const getRelatedIds = (
     records: RaRecord[],
     field: string
-): Identifier[] =>
-    Array.from(
-        new Set(
-            records
-                .filter(record => record[field] != null)
-                .map(record => record[field])
-                .reduce((ids, value) => ids.concat(value), [])
-        )
-    );
+): Identifier[] => {
+    const set = new Set<Identifier>();
+
+    records.forEach(record => {
+        const value = record[field];
+        if (!isNil(value)) {
+            castArray(value).forEach(id => set.add(id));
+        }
+    });
+
+    return Array.from(set);
+};

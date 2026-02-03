@@ -1,4 +1,6 @@
 import * as React from 'react';
+import map from 'lodash/map.js';
+import keys from 'lodash/keys.js';
 
 import getValuesFromRecords from './getValuesFromRecords';
 import InferredElement from './InferredElement';
@@ -137,23 +139,15 @@ const inferElementFromValues = (
     }
     if (valuesAreArray(values)) {
         if (isObject(values[0][0]) && hasType('array', types)) {
-            const leafValues = getValuesFromRecords(
-                values.reduce((acc, vals) => acc.concat(vals), [])
-            );
+            const leafValues = getValuesFromRecords(values.flat());
             // FIXME bad visual representation
             return (
                 types.array &&
                 new InferredElement(
                     types.array,
-                    {
-                        source: name,
-                    },
-                    Object.keys(leafValues).map(leafName =>
-                        inferElementFromValues(
-                            leafName,
-                            leafValues[leafName],
-                            types
-                        )
+                    { source: name },
+                    map(leafValues, (leafValues, leafName) =>
+                        inferElementFromValues(leafName, leafValues, types)
                     )
                 )
             );
@@ -202,7 +196,7 @@ const inferElementFromValues = (
     if (valuesAreObject(values)) {
         // we need to go deeper
         // Arbitrarily, choose the first prop of the first object
-        const propName = Object.keys(values[0]).shift();
+        const propName = keys(values[0])[0];
         if (!propName) {
             return new InferredElement(types.string, { source: name });
         }
